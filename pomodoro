@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# 'maxSessions' is the total number of pomodoro sessions.
+# 'sessionCount' refers to the current session.
+# The variable 'maxSessions' needs to be passed as an argument using the command line.
+# Usage: pomodoro [-s|--session] [maxSessions] [-d|--duration] [duration]
+# Accepted value for 'maxSessions' is an integer.
+# 'duration' corresponds to duration of a session in minutes.
+# 'breakTime' corresponds to an integer measuring duration of a break in minutes.
+
+maxSessions=4
+duration=25
+
+case $1 in
+	-s|--sessions)
+		maxSessions=$2
+		;;
+	*)
+		echo "One or more arguments missing."
+		exit 1
+esac
+
+sessionCount=1
+
+while [ $sessionCount -le $maxSessions ]
+do
+	# Notification sent after session begins.
+	notify-send "Session $sessionCount started !" 'Will finish in 25min.'
+	sleep 25m
+	# Uncomment the following two lines and comment the two lines above this to test.
+	#notify-send --expire-time=2000 "Session $sessionCount started !" 'Will finish in 25s.'
+	#sleep 25s
+
+	# Running the script which measures the break.
+	./rest $sessionCount $maxSessions
+
+	# The following conditional statement executes if 'sessionCount' is a multiple of 4 and 'maxSessions' is greater than 4.
+	# The second expression '$maxSessions -gt 4' is used because in cases where there are only 4 sessions, the notification must not be shown.
+	if [ $(($sessionCount % 4)) -eq 0 -a $maxSessions -gt 4 ]
+	then
+		notify-send --expire-time=5000 "Next set" "..in 15 seconds"
+		sleep 15s
+	fi
+	sessionCount=$(($sessionCount + 1))
+done
+
+notify-send "Yay! Finished all sessions."
