@@ -28,14 +28,17 @@
 maxSessions=4
 duration=25
 
-case $1 in
-	-s|--sessions)
-		maxSessions=$2
-		;;
-	*)
-		echo "One or more arguments missing."
-		exit 1
-esac
+if [ $# -ne 0 ]
+then
+	case $1 in
+		-s|--sessions)
+			maxSessions=$2
+			;;
+		*)
+			echo "One or more arguments missing."
+			exit 1
+	esac
+fi
 
 sessionCount=1
 
